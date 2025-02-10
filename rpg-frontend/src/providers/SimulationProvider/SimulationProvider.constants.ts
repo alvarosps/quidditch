@@ -1,0 +1,30 @@
+import { QuidditchPosition } from '@constants/quidditch';
+import { SimulationContextType } from './SimulationProvider.types';
+
+export const initialSimulationData: SimulationContextType = {
+    match: null,
+    setMatch: () => {},
+    matchData: null,
+    simulateNextRound: async () => {},
+    mode: 'roundByRound',
+    toggleAutoMode: () => {},
+    setMode: () => {},
+    roundInterval: 1000,
+    setRoundInterval: () => {},
+    manualKnockdown: false,
+    setManualKnockdown: () => {},
+    manualCrowd: false,
+    setManualCrowd: () => {},
+    round: 1,
+    setRound: () => {},
+    score: { team1: 0, team2: 0 },
+    setScore: () => {},
+    description: '',
+    setDescription: () => {},
+    isPaused: false,
+    onPauseToggle: () => {},
+    onRequestKnockdown: async () => QuidditchPosition.Seeker,
+    onRequestCrowdCheer: async () => [],
+    resetMatch: () => {},
+    simulateNextPhase: async () => {},
+};
