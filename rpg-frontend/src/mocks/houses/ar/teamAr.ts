@@ -1,19 +1,19 @@
 import { QuidditchTeam } from '@engine/QuidditchTeam';
 import {
     QuidditchAr_Alberto,
-    QuidditchAr_ArtilheiroReserva1,
-    QuidditchAr_ArtilheiroReserva2,
-    QuidditchAr_BatedorReserva1,
-    QuidditchAr_BatedorReserva2,
     QuidditchAr_Bruna,
     QuidditchAr_Camila,
+    QuidditchAr_Duda,
     QuidditchAr_Enzo,
-    QuidditchAr_GoleiroReserva,
+    QuidditchAr_Estelle,
     QuidditchAr_Heitor,
     QuidditchAr_Isadora,
     QuidditchAr_Joana,
     QuidditchAr_Joaquim,
     QuidditchAr_Leonardo,
+    QuidditchAr_Marciane,
+    QuidditchAr_Max,
+    QuidditchAr_Renata,
 } from './players';
 
 const teamArPlayers = {
@@ -22,16 +22,16 @@ const teamArPlayers = {
         QuidditchAr_Isadora,
         QuidditchAr_Enzo,
         QuidditchAr_Joana,
-        QuidditchAr_ArtilheiroReserva1,
-        QuidditchAr_ArtilheiroReserva2,
+        QuidditchAr_Renata,
+        QuidditchAr_Marciane,
     ],
     Beater: [
         QuidditchAr_Bruna,
         QuidditchAr_Camila,
-        QuidditchAr_BatedorReserva1,
-        QuidditchAr_BatedorReserva2,
+        QuidditchAr_Max,
+        QuidditchAr_Estelle,
     ],
-    Keeper: [QuidditchAr_Heitor, QuidditchAr_GoleiroReserva],
+    Keeper: [QuidditchAr_Heitor, QuidditchAr_Duda],
     Seeker: [QuidditchAr_Alberto, QuidditchAr_Joaquim],
 };
 

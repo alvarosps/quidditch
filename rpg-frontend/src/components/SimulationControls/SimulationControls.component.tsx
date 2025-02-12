@@ -1,5 +1,4 @@
-// src/components/SimulationControls/SimulationControls.component.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Box,
     FormControlLabel,
@@ -14,19 +13,12 @@ import {
 } from '@mui/material';
 import { useSimulationContext } from '@providers/SimulationProvider';
 import styled from 'styled-components';
+import { ControlsContainer } from './SimulationControls.styles';
 
-const ControlsContainer = styled(Box)`
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: #fff;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-`;
-
-const SimulationControls: React.FC = () => {
+const SimulationControls = () => {
     const {
-        mode,
-        setMode,
+        simulationMode,
+        setSimulationMode,
         roundInterval,
         setRoundInterval,
         manualKnockdown,
@@ -42,17 +34,21 @@ const SimulationControls: React.FC = () => {
     >(null);
 
     const handleModeChange = (newMode: 'auto' | 'roundByRound') => {
-        if (mode === 'roundByRound' && newMode === 'auto' && !isPaused) {
+        if (
+            simulationMode === 'roundByRound' &&
+            newMode === 'auto' &&
+            !isPaused
+        ) {
             setPendingMode(newMode);
             setConfirmOpen(true);
         } else {
-            setMode(newMode);
+            setSimulationMode(newMode);
         }
     };
 
     const handleConfirmModeSwitch = () => {
         if (pendingMode) {
-            setMode(pendingMode);
+            setSimulationMode(pendingMode);
             setConfirmOpen(false);
             setPendingMode(null);
         }
@@ -67,7 +63,7 @@ const SimulationControls: React.FC = () => {
                 <FormControlLabel
                     control={
                         <Switch
-                            checked={mode === 'auto'}
+                            checked={simulationMode === 'auto'}
                             onChange={(e) =>
                                 handleModeChange(
                                     e.target.checked ? 'auto' : 'roundByRound'
@@ -78,13 +74,15 @@ const SimulationControls: React.FC = () => {
                         />
                     }
                     label={
-                        mode === 'auto' ? 'Auto Mode' : 'Round-by-Round Mode'
+                        simulationMode === 'auto'
+                            ? 'Auto Mode'
+                            : 'Round-by-Round Mode'
                     }
                 />
 
                 <Box width={200}>
                     <Typography id="round-interval-slider" gutterBottom>
-                        Round Interval (ms)
+                        Round Interval (ms): {roundInterval}
                     </Typography>
                     <Slider
                         value={roundInterval}

@@ -1,76 +1,96 @@
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { ManualInputContextType } from './ManualInputProvider.types';
-import { ManualInputContext } from './ManualInputProvider.context';
+import {
+    ManualInputContext,
+    useManualInputContext,
+} from './ManualInputProvider.context';
 import ManualKnockdownModal from '@components/ManualKnockdownModal';
 import ManualCrowdModal from '@components/ManualCrowdModal';
-import { QuidditchPosition } from '@constants/quidditch';
+import { PARTIAL_MAX, QuidditchPosition } from '@constants/quidditch';
+import { useSimulationContext } from '@providers/SimulationProvider';
+import { QuidditchTeam } from '@engine/QuidditchTeam';
 
 const ManualInputProvider = ({ children }: { children: ReactNode }) => {
-    const [knockdownModalOpen, setKnockdownModalOpen] = useState(false);
-    const [crowdModalOpen, setCrowdModalOpen] = useState(false);
-    const [knockdownResolver, setKnockdownResolver] = useState<
-        (value: QuidditchPosition) => void
-    >(() => () => {});
-    const [crowdResolver, setCrowdResolver] = useState<
-        (value: QuidditchPosition[]) => void
-    >(() => () => {});
-    const [crowdSelections, setCrowdSelections] = useState<number>(2);
+    const { phaseData, setUserInputData } = useSimulationContext();
 
-    // Define your available positions (you might adjust this layout later)
-    const availablePositions = [
-        QuidditchPosition.Chaser,
-        QuidditchPosition.Beater,
-        QuidditchPosition.Keeper,
-        QuidditchPosition.Seeker,
-    ];
+    const [knockdownModalData, setKnockdownModalData] = useState<{
+        isOpen: boolean;
+        team: QuidditchTeam | null;
+    }>({
+        isOpen: false,
+        team: null,
+    });
+    const [crowdModalData, setCrowdModalData] = useState<{
+        isOpen: boolean;
+        team: QuidditchTeam | null;
+        numSelections: number;
+    }>({
+        isOpen: false,
+        team: null,
+        numSelections: 0,
+    });
+    const [knockdownSelectedPosition, setKnockdownSelectedPosition] =
+        useState<QuidditchPosition | null>(null);
+    const [crowdSelectedPositions, setCrowdSelectedPositions] = useState<
+        QuidditchPosition[]
+    >([]);
 
-    const requestKnockdown = useCallback((): Promise<QuidditchPosition> => {
-        return new Promise((resolve) => {
-            setKnockdownResolver(() => resolve);
-            setKnockdownModalOpen(true);
-        });
-    }, []);
+    useEffect(() => {
+        if (phaseData) {
+            if (phaseData.typeOfInput === 'knockdown') {
+                setKnockdownModalData({
+                    isOpen: true,
+                    team: phaseData.currentTeam,
+                });
+            } else if (phaseData.typeOfInput === 'crowd') {
+                setCrowdModalData({
+                    isOpen: true,
+                    team: phaseData.currentTeam,
+                    numSelections: phaseData.roll > PARTIAL_MAX ? 2 : 1,
+                });
+            }
+        }
+    }, [phaseData]);
 
-    const requestCrowdCheer = useCallback(
-        (selections: number): Promise<QuidditchPosition[]> => {
-            setCrowdSelections(selections);
-            return new Promise((resolve) => {
-                setCrowdResolver(() => resolve);
-                setCrowdModalOpen(true);
+    useEffect(() => {
+        if (knockdownSelectedPosition) {
+            setUserInputData({
+                knockdown: knockdownSelectedPosition,
             });
-        },
-        []
-    );
-
-    const contextValue: ManualInputContextType = {
-        requestKnockdown,
-        requestCrowdCheer,
-    };
+            setKnockdownSelectedPosition(null);
+        } else if (crowdSelectedPositions.length > 0) {
+            setUserInputData({
+                crowd: [...crowdSelectedPositions],
+            });
+            setCrowdSelectedPositions([]);
+        }
+    }, [knockdownSelectedPosition, crowdSelectedPositions]);
 
     return (
-        <ManualInputContext.Provider value={contextValue}>
+        <ManualInputContext.Provider value={{}}>
             {children}
             <ManualKnockdownModal
-                open={knockdownModalOpen}
-                availablePositions={availablePositions}
+                open={knockdownModalData.isOpen}
+                team={knockdownModalData.team}
                 onSelect={(position: QuidditchPosition) => {
-                    setKnockdownModalOpen(false);
-                    knockdownResolver(position);
-                }}
-                onCancel={() => {
-                    setKnockdownModalOpen(false);
+                    setKnockdownModalData({
+                        isOpen: false,
+                        team: null,
+                    });
+                    setKnockdownSelectedPosition(position);
                 }}
             />
             <ManualCrowdModal
-                open={crowdModalOpen}
-                availablePositions={availablePositions}
-                selections={crowdSelections}
+                open={crowdModalData.isOpen}
+                team={crowdModalData.team}
+                selections={crowdModalData.numSelections}
                 onSelect={(positions) => {
-                    setCrowdModalOpen(false);
-                    crowdResolver(positions);
-                }}
-                onCancel={() => {
-                    setCrowdModalOpen(false);
+                    setCrowdModalData({
+                        isOpen: false,
+                        team: null,
+                        numSelections: 0,
+                    });
+                    setCrowdSelectedPositions([...positions]);
                 }}
             />
         </ManualInputContext.Provider>

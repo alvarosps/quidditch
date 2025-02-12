@@ -1,14 +1,6 @@
-// src/components/ControlPanel/ControlPanel.component.tsx
-import React from 'react';
-import { Button, ButtonGroup, Box } from '@mui/material';
-import styled from 'styled-components';
+import { Button, ButtonGroup } from '@mui/material';
 import { useSimulationContext } from '@providers/SimulationProvider';
-
-const PanelContainer = styled(Box)`
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-`;
+import { PanelContainer } from './ControlPanel.styles';
 
 const ControlPanel: React.FC = () => {
     const {
@@ -16,39 +8,39 @@ const ControlPanel: React.FC = () => {
         simulateNextRound,
         onPauseToggle,
         isPaused,
-        mode,
-        matchData,
+        simulationMode,
         resetMatch,
+        simulationState,
     } = useSimulationContext();
 
     return (
         <PanelContainer>
             <ButtonGroup variant="contained" color="primary">
                 <Button
-                    onClick={simulateNextRound}
-                    disabled={matchData?.matchEnded}
+                    onClick={() => simulateNextRound()}
+                    disabled={simulationState.matchEnded}
                 >
-                    Next Round
+                    {simulationState.currentRound === 1
+                        ? 'Start Match'
+                        : 'Next Round'}
                 </Button>
                 <Button
                     onClick={toggleAutoMode}
-                    disabled={matchData?.matchEnded}
+                    disabled={simulationState.matchEnded}
                 >
-                    {mode === 'auto'
+                    {simulationMode === 'auto'
                         ? 'Switch to Manual'
                         : 'Switch to Automatic'}
                 </Button>
-                {mode === 'auto' && (
+                {simulationMode === 'auto' && (
                     <Button
                         onClick={onPauseToggle}
-                        disabled={matchData?.matchEnded}
+                        disabled={simulationState.matchEnded}
                     >
                         {isPaused ? 'Resume' : 'Pause'}
                     </Button>
                 )}
-                <Button onClick={resetMatch} disabled={!matchData?.matchEnded}>
-                    Restart Match
-                </Button>
+                <Button onClick={resetMatch}>Restart Match</Button>
             </ButtonGroup>
         </PanelContainer>
     );

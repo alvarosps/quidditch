@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -10,23 +10,24 @@ import {
     Typography,
     Grid,
 } from '@mui/material';
-import { QuidditchPosition } from '@_types/Quidditch';
+import { QuidditchPosition } from '@constants/quidditch';
+import { QuidditchTeam } from '@engine/QuidditchTeam';
 
 interface ManualCrowdModalProps {
     open: boolean;
-    availablePositions: QuidditchPosition[];
+    team: QuidditchTeam;
     selections: number;
     onSelect: (positions: QuidditchPosition[]) => void;
-    onCancel: () => void;
 }
 
-const ManualCrowdModal: React.FC<ManualCrowdModalProps> = ({
+const ManualCrowdModal = ({
     open,
-    availablePositions,
+    team,
     selections,
     onSelect,
-    onCancel,
-}) => {
+}: ManualCrowdModalProps) => {
+    const availablePositions = team ? team.getAvailablePositions() : [];
+
     const [selectedPositions, setSelectedPositions] = useState<
         QuidditchPosition[]
     >([]);
@@ -48,7 +49,7 @@ const ManualCrowdModal: React.FC<ManualCrowdModalProps> = ({
     };
 
     return (
-        <Dialog open={open} onClose={onCancel}>
+        <Dialog open={open} onClose={() => {}}>
             <DialogTitle variant="h5">
                 Select {selections} Position{selections > 1 ? 's' : ''} for
                 Crowd Bonus
@@ -58,7 +59,9 @@ const ManualCrowdModal: React.FC<ManualCrowdModalProps> = ({
                     {availablePositions.map((position) => (
                         <Grid item xs={6} key={position}>
                             <ListItemButton
-                                onClick={() => handleToggle(position)}
+                                onClick={() =>
+                                    handleToggle(position as QuidditchPosition)
+                                }
                             >
                                 <ListItemText
                                     primary={position}
@@ -73,9 +76,6 @@ const ManualCrowdModal: React.FC<ManualCrowdModalProps> = ({
                 </Typography>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel} color="secondary">
-                    Cancel
-                </Button>
                 <Button
                     onClick={handleConfirm}
                     disabled={selectedPositions.length !== selections}

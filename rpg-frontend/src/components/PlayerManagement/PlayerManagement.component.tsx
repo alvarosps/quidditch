@@ -1,5 +1,3 @@
-// src/components/PlayerManagement/PlayerManagement.component.tsx
-import React from 'react';
 import {
     Paper,
     TextField,
@@ -17,13 +15,13 @@ interface PlayerManagementProps {
     onIsPlayingToggle: (player: QuidditchPlayer) => void;
 }
 
-const PlayerManagement: React.FC<PlayerManagementProps> = ({
+const PlayerManagement = ({
     player,
     onNameChange,
     onModifierChange,
     onMainTeamToggle,
     onIsPlayingToggle,
-}) => {
+}: PlayerManagementProps) => {
     return (
         <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
             <Grid container spacing={2} alignItems="center">

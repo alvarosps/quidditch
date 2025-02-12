@@ -33,6 +33,13 @@ export class QuidditchPlayer {
         this.isPlaying = false;
         this.isMainTeam = false;
     };
+    public getPlayerBonus(): number {
+        return this.modifier + this.crowdBonus + this.forward;
+    }
+    public resetBonus(): void {
+        this.crowdBonus = 0;
+        this.forward = 0;
+    }
     // Getters and setters
     public getName = (): string => this.name;
     public setName = (name: string): void => {

@@ -1,18 +1,32 @@
 import { QuidditchMatch } from 'engine/QuidditchMatch';
-import { QuidditchMatchData, QuidditchMatchScore } from '@_types/Quidditch';
-import { GameModeType } from '@_types/Simulation';
+import { QuidditchMatchScore } from '@_types/Quidditch';
+import {
+    GameModeType,
+    PhaseData,
+    SimulationResult,
+    SimulationState,
+} from '@_types/Simulation';
 import { QuidditchPosition } from '@constants/quidditch';
 
 export type SimulationMode = 'auto' | 'roundByRound';
 
+export type UserInputData = {
+    knockdown?: QuidditchPosition | null;
+    crowd?: QuidditchPosition[] | null;
+};
+
 export type SimulationContextType = {
+    phaseData: PhaseData | null;
+    setUserInputData: (data: UserInputData) => void;
     match: QuidditchMatch | null;
     setMatch: (match: QuidditchMatch | null) => void;
-    matchData: QuidditchMatchData | null;
-    simulateNextRound: () => Promise<void>;
-    mode: SimulationMode;
+    simulateNextRound: (
+        userInput?: QuidditchPosition | QuidditchPosition[]
+    ) => void;
+    simulationState: SimulationState;
+    simulationMode: SimulationMode;
     toggleAutoMode: () => void;
-    setMode: (mode: GameModeType) => void;
+    setSimulationMode: (mode: GameModeType) => void;
     roundInterval: number;
     setRoundInterval: (ms: number) => void;
     manualKnockdown: boolean;
@@ -20,15 +34,15 @@ export type SimulationContextType = {
     manualCrowd: boolean;
     setManualCrowd: (value: boolean) => void;
     round: number;
-    setRound: (round: number) => void;
     score: QuidditchMatchScore;
-    setScore: (score: QuidditchMatchScore) => void;
-    description: string;
-    setDescription: (description: string) => void;
+    clearDescription: () => void;
     isPaused: boolean;
     onPauseToggle: () => void;
-    onRequestKnockdown?: () => Promise<QuidditchPosition>;
-    onRequestCrowdCheer?: (selections: number) => Promise<QuidditchPosition[]>;
     resetMatch: () => void;
-    simulateNextPhase: () => Promise<void>;
+    simulateNextPhase: (
+        state: SimulationState,
+        userInput?: QuidditchPosition | QuidditchPosition[]
+    ) => SimulationResult;
+    winner: string;
+    matchEnded: boolean;
 };

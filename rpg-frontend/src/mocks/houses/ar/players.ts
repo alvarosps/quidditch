@@ -1,19 +1,19 @@
 import { createQuidditchPlayerData } from '@engine/utils/createQuidditchData';
 import { Beater, Chaser, Keeper, Seeker } from '@models/QuidditchPositions';
 import {
-    ArtilheiroReserva1,
-    ArtilheiroReserva2,
-    BatedorReserva1,
-    BatedorReserva2,
     Bruna,
     Camila,
+    Duda,
     Enzo,
-    GoleiroReserva,
+    Estelle,
     Heitor,
     Isadora,
     Joana,
     Leonardo,
+    Marciane,
+    Max,
     Nichollas,
+    Renata,
 } from '@mocks/npcs/ar';
 import { Alberto, Joaquim } from '@mocks/players';
 
@@ -94,36 +94,36 @@ export const QuidditchAr_Leonardo = new Chaser(
     })
 );
 
-export const QuidditchAr_ArtilheiroReserva1 = new Chaser(
-    ArtilheiroReserva1,
+export const QuidditchAr_Renata = new Chaser(
+    Renata,
     createQuidditchPlayerData({
-        modifier: 1,
+        modifier: 2,
         isMainTeam: false,
         isPlaying: false,
     })
 );
 
-export const QuidditchAr_ArtilheiroReserva2 = new Chaser(
-    ArtilheiroReserva2,
+export const QuidditchAr_Marciane = new Chaser(
+    Marciane,
     createQuidditchPlayerData({
-        modifier: 1,
+        modifier: 3,
         isMainTeam: false,
         isPlaying: false,
     })
 );
 
 // Reserve Beaters
-export const QuidditchAr_BatedorReserva1 = new Beater(
-    BatedorReserva1,
+export const QuidditchAr_Max = new Beater(
+    Max,
     createQuidditchPlayerData({
-        modifier: 1,
+        modifier: 2,
         isMainTeam: false,
         isPlaying: false,
     })
 );
 
-export const QuidditchAr_BatedorReserva2 = new Beater(
-    BatedorReserva2,
+export const QuidditchAr_Estelle = new Beater(
+    Estelle,
     createQuidditchPlayerData({
         modifier: 1,
         isMainTeam: false,
@@ -132,10 +132,10 @@ export const QuidditchAr_BatedorReserva2 = new Beater(
 );
 
 // Reserve Keeper
-export const QuidditchAr_GoleiroReserva = new Keeper(
-    GoleiroReserva,
+export const QuidditchAr_Duda = new Keeper(
+    Duda,
     createQuidditchPlayerData({
-        modifier: 3,
+        modifier: 2,
         isMainTeam: false,
         isPlaying: false,
     })

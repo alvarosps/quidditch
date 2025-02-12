@@ -1,31 +1,27 @@
-import React from 'react';
 import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
-    Button,
     List,
     ListItemButton,
     ListItemText,
 } from '@mui/material';
-import { QuidditchPosition } from '@_types/Quidditch';
+import { QuidditchTeam } from '@engine/QuidditchTeam';
 
 interface ManualKnockdownModalProps {
     open: boolean;
-    availablePositions: QuidditchPosition[];
+    team: QuidditchTeam | null;
     onSelect: (position: string) => void;
-    onCancel: () => void;
 }
 
-const ManualKnockdownModal: React.FC<ManualKnockdownModalProps> = ({
+const ManualKnockdownModal = ({
     open,
-    availablePositions,
+    team,
     onSelect,
-    onCancel,
-}) => {
+}: ManualKnockdownModalProps) => {
+    const availablePositions = team ? team.getAvailablePositions() : [];
     return (
-        <Dialog open={open} onClose={onCancel}>
+        <Dialog open={open} onClose={() => {}}>
             <DialogTitle>Select a Position to Knock Down</DialogTitle>
             <DialogContent>
                 <List>
@@ -39,9 +35,6 @@ const ManualKnockdownModal: React.FC<ManualKnockdownModalProps> = ({
                     ))}
                 </List>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
-            </DialogActions>
         </Dialog>
     );
 };

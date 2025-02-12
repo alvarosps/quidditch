@@ -1,15 +1,7 @@
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { StyledLink } from './Navigation.styles';
 
-const StyledLink = styled(Link)`
-    color: inherit;
-    text-decoration: none;
-    margin-right: 16px;
-`;
-
-const Navigation: React.FC = () => {
+const Navigation = () => {
     return (
         <AppBar position="static">
             <Toolbar>
@@ -19,10 +11,6 @@ const Navigation: React.FC = () => {
                 <StyledLink to="/match">
                     <Button color="inherit">Match</Button>
                 </StyledLink>
-                {/* Future: Add a Settings link if needed */}
-                {/* <StyledLink to="/settings">
-          <Button color="inherit">Settings</Button>
-        </StyledLink> */}
             </Toolbar>
         </AppBar>
     );

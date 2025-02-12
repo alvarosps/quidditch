@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from 'react-router-dom';
 import Navigation from '@components/Navigation';
 import HomePage from '@pages/HomePage';
 import MatchPage from '@pages/MatchPage';
@@ -10,8 +15,8 @@ import { TeamsProvider } from '@providers/TeamsProvider';
 
 const App: React.FC = () => {
     return (
-        <ManualInputProvider>
-            <SimulationProvider>
+        <SimulationProvider>
+            <ManualInputProvider>
                 <TeamsProvider>
                     <Router>
                         <Navigation />
@@ -22,11 +27,15 @@ const App: React.FC = () => {
                                 path="/manage-team"
                                 element={<TeamManagementPage />}
                             />
+                            <Route
+                                path="*"
+                                element={<Navigate to="/" replace />}
+                            />
                         </Routes>
                     </Router>
                 </TeamsProvider>
-            </SimulationProvider>
-        </ManualInputProvider>
+            </ManualInputProvider>
+        </SimulationProvider>
     );
 };
 

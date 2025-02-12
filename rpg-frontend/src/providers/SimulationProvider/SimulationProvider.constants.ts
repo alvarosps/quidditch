@@ -1,14 +1,43 @@
-import { QuidditchPosition } from '@constants/quidditch';
 import { SimulationContextType } from './SimulationProvider.types';
+import { SimulationState } from '@_types/Simulation';
+
+export const initialSimulationState: SimulationState = {
+    team1: null,
+    team2: null,
+    currentPhaseIndex: 0,
+    description: '',
+    manualMode: {
+        knockdown: false,
+        crowd: false,
+    },
+    lastRoll: 0,
+    currentTeamIndex: 1,
+    matchEnded: false,
+    snitchSpotted: false,
+    snitchCaught: false,
+    seekerPriority: undefined,
+    currentRound: 1,
+    stopPhase: false,
+    beatersRolls: [],
+    countdownAfterTeamSeekersAreKnockedOut: 10,
+    teamSeekersKnockedOut: false,
+    scores: {
+        team1: 0,
+        team2: 0,
+    },
+    roundDescriptions: [],
+};
 
 export const initialSimulationData: SimulationContextType = {
+    phaseData: null,
+    setUserInputData: () => {},
     match: null,
     setMatch: () => {},
-    matchData: null,
-    simulateNextRound: async () => {},
-    mode: 'roundByRound',
+    simulateNextRound: () => {},
+    simulationState: initialSimulationState,
+    simulationMode: 'roundByRound',
     toggleAutoMode: () => {},
-    setMode: () => {},
+    setSimulationMode: () => {},
     roundInterval: 1000,
     setRoundInterval: () => {},
     manualKnockdown: false,
@@ -16,15 +45,12 @@ export const initialSimulationData: SimulationContextType = {
     manualCrowd: false,
     setManualCrowd: () => {},
     round: 1,
-    setRound: () => {},
     score: { team1: 0, team2: 0 },
-    setScore: () => {},
-    description: '',
-    setDescription: () => {},
     isPaused: false,
     onPauseToggle: () => {},
-    onRequestKnockdown: async () => QuidditchPosition.Seeker,
-    onRequestCrowdCheer: async () => [],
     resetMatch: () => {},
-    simulateNextPhase: async () => {},
+    simulateNextPhase: () => ({ newState: initialSimulationState }),
+    clearDescription: () => {},
+    winner: '',
+    matchEnded: false,
 };

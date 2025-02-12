@@ -1,134 +1,104 @@
-import { QuidditchMatchData, QuidditchMatchScore } from '@_types/Quidditch';
-import { QuidditchMatch } from 'engine/QuidditchMatch';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { SimulationContext } from './SimulationProvider.context';
-import {
-    SimulationContextType,
-    SimulationMode,
-} from './SimulationProvider.types';
-import { useManualInputContext } from '@providers/ManualInputProvider';
+import { SimulationContextType } from './SimulationProvider.types';
+import { useRoundSimulation, useSimulationControls } from './hooks';
+import { checkForMatchEnd } from '@engine/utils/simulation';
 
 const SimulationProvider = ({ children }: { children: ReactNode }) => {
-    const [match, setMatch] = useState<QuidditchMatch | null>(null);
-    const [matchData, setMatchData] = useState<QuidditchMatchData>({
-        description: '',
-        snitchSpotted: false,
-        snitchCaught: false,
-        currentRound: 1,
-        seekersKnockedOut: 0,
-        seekerPriority: undefined,
-        matchEnded: false,
-    });
-    const [mode, setMode] = useState<SimulationMode>('roundByRound');
-    const [roundInterval, setRoundInterval] = useState<number>(1000);
-    const [manualKnockdown, setManualKnockdown] = useState<boolean>(false);
-    const [manualCrowd, setManualCrowd] = useState<boolean>(false);
-    const [round, setRound] = useState(1);
-    const [score, setScore] = useState<QuidditchMatchScore>({
-        team1: 0,
-        team2: 0,
-    });
-    const [description, setDescription] = useState('');
-    const [isPaused, setIsPaused] = useState(false);
-
-    const { requestKnockdown, requestCrowdCheer } = useManualInputContext();
-
-    const simulateNextPhase = async () => {
-        if (match && !match.getMatchEnded()) {
-            const updatedData = await match.simulateNextPhase();
-            console.log(' phase', updatedData);
-            setMatchData({ ...updatedData });
-            setRound(updatedData.currentRound);
-            setScore({
-                team1: match.getTeam1().getScore(),
-                team2: match.getTeam2().getScore(),
-            });
-            setDescription(updatedData.description);
-        }
-    };
-
-    const simulateNextRound = async () => {
-        if (match && !match.getMatchEnded()) {
-            const updatedData = await match.simulateNextRound();
-            console.log('updatedData', updatedData);
-            setMatchData({ ...updatedData });
-            setRound(updatedData.currentRound);
-            setScore({
-                team1: match.getTeam1().getScore(),
-                team2: match.getTeam2().getScore(),
-            });
-            setDescription(updatedData.description);
-        }
-    };
-
-    const toggleAutoMode = () => {
-        setMode((prev) => (prev === 'auto' ? 'roundByRound' : 'auto'));
-    };
-
-    const onPauseToggle = () => {
-        setIsPaused((prev) => !prev);
-    };
-
-    const resetMatch = () => {
-        if (matchData) {
-            const newMatch = new QuidditchMatch(
-                match.getTeam1(),
-                match.getTeam2(),
-                mode,
-                requestKnockdown,
-                requestCrowdCheer,
-                {
-                    knockdown: manualKnockdown,
-                    crowd: manualCrowd,
-                }
-            );
-            newMatch.resetMatch();
-            setMatch(newMatch);
-            setMatchData(newMatch.getMatchData());
-            setRound(1);
-            setScore({
-                team1: 0,
-                team2: 0,
-            });
-            setDescription(newMatch.getMatchData().description);
-        }
-    };
-
-    useEffect(() => {
-        if (mode === 'auto' && match && !isPaused && !match.getMatchEnded()) {
-            const interval = setInterval(() => {
-                simulateNextRound();
-            }, roundInterval);
-            return () => clearInterval(interval);
-        }
-    }, [mode, match, isPaused, roundInterval, matchData]);
-
-    const contextValue: SimulationContextType = {
+    const {
         match,
         setMatch,
-        matchData,
+        simulationState,
+        setSimulationState,
+        phaseData,
+        setUserInputData,
         simulateNextRound,
-        mode,
+        resetMatch,
+        clearDescription,
+        simulateNextPhase,
+        isRoundOver,
+        score,
+    } = useRoundSimulation();
+
+    const {
+        simulationMode,
+        setSimulationMode,
         toggleAutoMode,
-        setMode,
         roundInterval,
         setRoundInterval,
         manualKnockdown,
         setManualKnockdown,
         manualCrowd,
         setManualCrowd,
-        round,
-        setRound,
-        score,
-        setScore,
-        description,
-        setDescription,
         isPaused,
         onPauseToggle,
-        onRequestKnockdown: requestKnockdown,
-        onRequestCrowdCheer: requestCrowdCheer,
+    } = useSimulationControls();
+
+    useEffect(() => {
+        setSimulationState((prev) => ({
+            ...prev,
+            manualMode: {
+                knockdown: manualKnockdown,
+                crowd: manualCrowd,
+            },
+        }));
+    }, [manualKnockdown, manualCrowd, setSimulationState]);
+
+    useEffect(() => {
+        if (
+            simulationMode === 'auto' &&
+            match &&
+            !isPaused &&
+            !checkForMatchEnd(simulationState)
+        ) {
+            const interval = setInterval(() => {
+                if (!isRoundOver.current) {
+                    simulateNextRound();
+                }
+            }, roundInterval);
+            return () => clearInterval(interval);
+        }
+    }, [
+        simulationMode,
+        match,
+        isPaused,
+        roundInterval,
+        simulationState.matchEnded,
+        isRoundOver.current,
+        simulationState,
+    ]);
+    const draw = score.team1 === score.team2;
+    const winnerTeam =
+        score.team1 > score.team2
+            ? simulationState.team1?.getName()
+            : simulationState.team2?.getName();
+    const winner = draw ? 'Draw!' : winnerTeam;
+
+    const contextValue: SimulationContextType = {
+        phaseData,
+        setUserInputData,
+        match,
+        setMatch,
+        simulateNextRound,
+        simulationState,
+        simulationMode,
+        toggleAutoMode,
+        setSimulationMode,
+        roundInterval,
+        setRoundInterval,
+        manualKnockdown,
+        setManualKnockdown,
+        manualCrowd,
+        setManualCrowd,
+        round: simulationState.currentRound,
+        score,
+        clearDescription,
+        isPaused,
+        onPauseToggle,
         resetMatch,
         simulateNextPhase,
+        winner,
+        matchEnded: simulationState.matchEnded,
     };
 
     return (

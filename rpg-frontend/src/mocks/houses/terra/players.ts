@@ -3,15 +3,15 @@ import {
     Alekxander,
     Andreia,
     Angela,
-    ApanhadorReserva,
-    ArtilheiroReserva1,
-    ArtilheiroReserva2,
-    ArtilheiroReserva3,
-    BatedorReserva1,
-    BatedorReserva2,
     Betina,
+    Eliana,
     Enzo,
-    GoleiroReserva,
+    Kristian,
+    Luis,
+    Luiza,
+    Marcelo,
+    Melek,
+    Pamela,
     Saulo,
     Vanessa,
 } from '@mocks/npcs/terra';
@@ -85,26 +85,8 @@ export const QuidditchTerra_Alekxander = new Seeker(
 );
 
 // Reserve Chasers
-export const QuidditchTerra_ArtilheiroReserva1 = new Chaser(
-    ArtilheiroReserva1,
-    createQuidditchPlayerData({
-        modifier: 2,
-        isMainTeam: false,
-        isPlaying: false,
-    })
-);
-
-export const QuidditchTerra_ArtilheiroReserva2 = new Chaser(
-    ArtilheiroReserva2,
-    createQuidditchPlayerData({
-        modifier: 2,
-        isMainTeam: false,
-        isPlaying: false,
-    })
-);
-
-export const QuidditchTerra_ArtilheiroReserva3 = new Chaser(
-    ArtilheiroReserva3,
+export const QuidditchTerra_Kristian = new Chaser(
+    Kristian,
     createQuidditchPlayerData({
         modifier: 1,
         isMainTeam: false,
@@ -112,9 +94,8 @@ export const QuidditchTerra_ArtilheiroReserva3 = new Chaser(
     })
 );
 
-// Reserve Beaters
-export const QuidditchTerra_BatedorReserva1 = new Beater(
-    BatedorReserva1,
+export const QuidditchTerra_Melek = new Chaser(
+    Melek,
     createQuidditchPlayerData({
         modifier: 2,
         isMainTeam: false,
@@ -122,8 +103,27 @@ export const QuidditchTerra_BatedorReserva1 = new Beater(
     })
 );
 
-export const QuidditchTerra_BatedorReserva2 = new Beater(
-    BatedorReserva2,
+export const QuidditchTerra_Luiza = new Chaser(
+    Luiza,
+    createQuidditchPlayerData({
+        modifier: 2,
+        isMainTeam: false,
+        isPlaying: false,
+    })
+);
+
+// Reserve Beaters
+export const QuidditchTerra_Luis = new Beater(
+    Luis,
+    createQuidditchPlayerData({
+        modifier: 2,
+        isMainTeam: false,
+        isPlaying: false,
+    })
+);
+
+export const QuidditchTerra_Pamela = new Beater(
+    Pamela,
     createQuidditchPlayerData({
         modifier: 1,
         isMainTeam: false,
@@ -132,18 +132,18 @@ export const QuidditchTerra_BatedorReserva2 = new Beater(
 );
 
 // Reserve Keeper
-export const QuidditchTerra_GoleiroReserva = new Keeper(
-    GoleiroReserva,
+export const QuidditchTerra_Marcelo = new Keeper(
+    Marcelo,
     createQuidditchPlayerData({
-        modifier: 1,
+        modifier: 2,
         isMainTeam: false,
         isPlaying: false,
     })
 );
 
 // Reserve Seeker
-export const QuidditchTerra_ApanhadorReserva = new Chaser(
-    ApanhadorReserva,
+export const QuidditchTerra_Eliana = new Seeker(
+    Eliana,
     createQuidditchPlayerData({
         modifier: 2,
         isMainTeam: false,

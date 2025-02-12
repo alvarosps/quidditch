@@ -41,6 +41,13 @@ export class Seeker extends QuidditchPlayer {
         this.roundBonus = 0;
     }
 
+    public getPlayerBonus(): number {
+        return super.getPlayerBonus() + this.roundBonus;
+    }
+    public incrementRoundBonus(): void {
+        this.roundBonus += 1;
+    }
+
     public getRoundBonus = (): number => this.roundBonus;
     public setRoundBonus = (roundBonus: number): void => {
         this.roundBonus = roundBonus;
