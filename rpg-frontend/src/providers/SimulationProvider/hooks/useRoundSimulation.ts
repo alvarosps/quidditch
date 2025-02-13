@@ -22,8 +22,6 @@ export const useRoundSimulation = () => {
     }>({});
     const isRoundOver = useRef(false);
     const [score, setScore] = useState({ team1: 0, team2: 0 });
-    console.log('userInput', userInputData);
-    console.log('phaseData', phaseData);
     const handleNeedForUserInput = (
         state: SimulationState,
         typeOfInput: 'crowd' | 'knockdown'
@@ -134,7 +132,6 @@ export const useRoundSimulation = () => {
             team2: match?.getTeam2(),
         }));
     }, [match, setSimulationState]);
-    console.log('simulationState', simulationState);
     return {
         match,
         setMatch,

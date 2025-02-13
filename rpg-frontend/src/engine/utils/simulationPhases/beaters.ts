@@ -22,7 +22,6 @@ export const beatersPhase = (
     userInput?: ManualKnockdownInput
 ): SimulationResult => {
     const team1Phase = teamBeatersRound(state, 1, false, userInput);
-    console.log('team1Phase', team1Phase);
     const team2Phase = teamBeatersRound(
         team1Phase.newState,
         2,
@@ -74,15 +73,10 @@ export const teamBeatersRound = (
             userInputRequired: false,
         };
     }
-    console.log('1', beatersRolls);
     if (userInput && currentState.beatersRolls.length >= teamIndex) {
-        console.log('on state', currentState.beatersRolls);
         beatersRolls = [...currentState.beatersRolls[teamIndex - 1]];
-        console.log('beatersRolls', beatersRolls);
     }
-    console.log('2', beatersRolls);
     if (beatersRolls.length === 0) {
-        console.log('beatersPlaying', beatersPlaying);
         for (const beater of beatersPlaying) {
             const beaterBonus = beater.getPlayerBonus();
             const diceRoll = getDiceRoll(beaterBonus);
@@ -94,7 +88,6 @@ export const teamBeatersRound = (
             team.updateTeamPlayerMainTeam(beater, QuidditchPosition.Beater);
         }
     }
-    console.log('beaterrrrrrr', beatersRolls);
     if (
         (currentState.manualMode.knockdown &&
             beatersPhaseRequireManualInput(
@@ -156,8 +149,6 @@ export const teamBeatersRound = (
             userInput,
             beatersRoundDescription
         );
-    } else {
-        console.log('else', beatersRolls);
     }
 };
 
