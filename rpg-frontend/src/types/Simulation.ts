@@ -39,10 +39,11 @@ export type SimulationState = {
     seekerPriority: string | undefined;
     currentRound: number;
     stopPhase: boolean;
-    beatersRolls: number[];
+    beatersRolls: number[][];
     teamSeekersKnockedOut: boolean;
     countdownAfterTeamSeekersAreKnockedOut: number;
     roundDescriptions: RoundDescription[];
+    crowdRolls: number[];
 };
 
 export type SimulationResult = {
@@ -52,12 +53,19 @@ export type SimulationResult = {
 };
 
 export type ManualKnockdownInput = {
-    position: QuidditchPosition;
+    team1: QuidditchPosition;
+    team2: QuidditchPosition;
 };
 
 export type ManualCrowdInput = {
-    position1: QuidditchPosition;
-    position2?: QuidditchPosition;
+    team1: {
+        position1: QuidditchPosition;
+        position2?: QuidditchPosition;
+    };
+    team2: {
+        position1: QuidditchPosition;
+        position2?: QuidditchPosition;
+    };
 };
 
 export type ManualInput = {
@@ -69,6 +77,11 @@ export type PhaseData = {
     round: number;
     phaseIndex: number;
     roll: number;
+    rollTeam1: number;
+    rollTeam2: number;
+    beaterRolls: number[][];
     currentTeam: QuidditchTeam;
+    team1: QuidditchTeam;
+    team2: QuidditchTeam;
     typeOfInput?: 'knockdown' | 'crowd';
 };

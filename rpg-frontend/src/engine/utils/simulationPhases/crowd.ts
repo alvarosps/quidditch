@@ -1,4 +1,8 @@
-import { SimulationResult, SimulationState } from '@_types/Simulation';
+import {
+    ManualCrowdInput,
+    SimulationResult,
+    SimulationState,
+} from '@_types/Simulation';
 import {
     FAILURE_MAX,
     PARTIAL_MAX,
@@ -10,107 +14,106 @@ import { choosePositionRandomly } from '../quidditchPlayers';
 
 export const crowdsPhase = (
     state: SimulationState,
-    userInput?: QuidditchPosition[]
+    userInput?: ManualCrowdInput
 ): SimulationResult => {
-    if (state.currentTeamIndex === 1) {
-        const team1Phase = teamCrowdRound(state, 1, userInput);
-        if (team1Phase.userInputRequired) {
-            return team1Phase;
-        }
-        const team2Phase = teamCrowdRound(team1Phase.newState, 2, userInput);
-        if (team2Phase.userInputRequired) {
-            return team2Phase;
-        }
-        const countdown = team2Phase.newState.teamSeekersKnockedOut
-            ? team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut - 1
-            : team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut;
-
-        const team1SeekersPlaying =
-            team2Phase.newState.team1.teamHasSeekerPlaying();
-        const team2SeekersPlaying =
-            team2Phase.newState.team2.teamHasSeekerPlaying();
-
-        return {
-            newState: {
-                ...team2Phase.newState,
-                currentPhaseIndex: 0,
-                currentTeamIndex: 1,
-                currentRound: state.currentRound + 1,
-                countdownAfterTeamSeekersAreKnockedOut: countdown,
-                teamSeekersKnockedOut:
-                    !team1SeekersPlaying || !team2SeekersPlaying,
-                matchEnded:
-                    countdown === 0 ||
-                    (!team1SeekersPlaying && !team2SeekersPlaying),
-            },
-        };
-    } else {
-        const team2Phase = teamCrowdRound(state, 2, userInput);
-        if (team2Phase.userInputRequired) {
-            team2Phase;
-        }
-        const countdown = team2Phase.newState.teamSeekersKnockedOut
-            ? team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut - 1
-            : team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut;
-
-        const team1SeekersPlaying =
-            team2Phase.newState.team1.teamHasSeekerPlaying();
-        const team2SeekersPlaying =
-            team2Phase.newState.team2.teamHasSeekerPlaying();
-        return {
-            newState: {
-                ...team2Phase.newState,
-                currentPhaseIndex: 0,
-                currentTeamIndex: 1,
-                currentRound: state.currentRound + 1,
-                countdownAfterTeamSeekersAreKnockedOut: countdown,
-                teamSeekersKnockedOut:
-                    !team1SeekersPlaying || !team2SeekersPlaying,
-                matchEnded:
-                    countdown === 0 ||
-                    (!team1SeekersPlaying && !team2SeekersPlaying),
-            },
-        };
+    const team1Phase = teamCrowdRound(state, 1, userInput);
+    const team2Phase = teamCrowdRound(team1Phase.newState, 2, userInput);
+    if (team2Phase.userInputRequired) {
+        return team2Phase;
     }
+    const countdown = team2Phase.newState.teamSeekersKnockedOut
+        ? team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut - 1
+        : team2Phase.newState.countdownAfterTeamSeekersAreKnockedOut;
+
+    const team1SeekersPlaying =
+        team2Phase.newState.team1.teamHasSeekerPlaying();
+    const team2SeekersPlaying =
+        team2Phase.newState.team2.teamHasSeekerPlaying();
+
+    return {
+        newState: {
+            ...team2Phase.newState,
+            currentPhaseIndex: 0,
+            currentTeamIndex: 1,
+            currentRound: state.currentRound + 1,
+            countdownAfterTeamSeekersAreKnockedOut: countdown,
+            teamSeekersKnockedOut: !team1SeekersPlaying || !team2SeekersPlaying,
+            matchEnded:
+                countdown === 0 ||
+                (!team1SeekersPlaying && !team2SeekersPlaying),
+        },
+    };
 };
 
 const teamCrowdRound = (
     state: SimulationState,
     teamIndex: number,
-    userInput?: QuidditchPosition[]
+    userInput?: ManualCrowdInput
 ): SimulationResult => {
     const currentState = { ...state };
     const team = teamIndex === 1 ? currentState.team1 : currentState.team2;
     let diceRoll: number;
 
     if (userInput) {
-        diceRoll = currentState.lastRoll;
+        diceRoll =
+            teamIndex === 1
+                ? currentState.crowdRolls[0]
+                : currentState.crowdRolls[1];
     } else {
         const crowdBonus = team.getCrowdModifier();
         diceRoll = getDiceRoll(crowdBonus);
     }
 
+    const crowdsRoundDescription = [];
+    crowdsRoundDescription.push(`Crowd | Roll: ${diceRoll}`);
     if (currentState.manualMode.crowd && diceRoll > FAILURE_MAX && !userInput) {
+        const newCrowdRolls = [...currentState.crowdRolls];
+        newCrowdRolls.push(diceRoll);
         return {
             newState: {
                 ...currentState,
-                description: `${currentState.description}`,
                 lastRoll: diceRoll,
-                currentTeamIndex: teamIndex === 1 ? 2 : 1,
+                currentTeamIndex: teamIndex,
+                crowdRolls: newCrowdRolls,
+                roundDescriptions: getRoundDescriptionsObjectOnPhase(
+                    currentState,
+                    teamIndex,
+                    currentState.currentPhaseIndex,
+                    crowdsRoundDescription
+                ),
             },
             userInputRequired: true,
             typeOfInput: 'crowd',
         };
     }
-    const crowdsRoundDescription = [];
-    crowdsRoundDescription.push(`Crowd | Roll: ${diceRoll}`);
-    let [position1, position2] = userInput || [
-        choosePositionRandomly(currentState),
-        choosePositionRandomly(currentState),
-    ];
-    if (position2 === position1) {
-        while (position2 === position1) {
-            position2 = choosePositionRandomly(currentState);
+    let position1: QuidditchPosition;
+    let position2: QuidditchPosition;
+    if (userInput) {
+        if (teamIndex === 1 && userInput.team1) {
+            if (userInput.team1.position1) {
+                position1 = userInput.team1.position1;
+            }
+            if (userInput.team1.position2) {
+                position2 = userInput.team1.position2;
+            }
+        } else if (teamIndex === 2 && userInput.team2) {
+            if (userInput.team2.position1) {
+                position1 = userInput.team2.position1;
+            }
+            if (userInput.team2.position2) {
+                position2 = userInput.team2.position2;
+            }
+        }
+    }
+    if (!position1) {
+        position1 = choosePositionRandomly(currentState);
+    }
+    if (!position2) {
+        position2 = choosePositionRandomly(currentState);
+        if (position2 === position1) {
+            while (position2 === position1) {
+                position2 = choosePositionRandomly(currentState);
+            }
         }
     }
 

@@ -1,4 +1,9 @@
-import { SimulationResult, SimulationState } from '@_types/Simulation';
+import {
+    ManualCrowdInput,
+    ManualKnockdownInput,
+    SimulationResult,
+    SimulationState,
+} from '@_types/Simulation';
 import {
     QuidditchPosition,
     SIMULATION_STEP_PHASES,
@@ -14,7 +19,7 @@ import { QuidditchMatchScore } from '@_types/Quidditch';
 
 export const simulatePhase = (
     state: SimulationState,
-    userInput?: QuidditchPosition | QuidditchPosition[]
+    userInput?: ManualKnockdownInput | ManualCrowdInput
 ): SimulationResult => {
     if (state.matchEnded) {
         return {
@@ -30,8 +35,11 @@ export const simulatePhase = (
     if (currentPhase === QuidditchPosition.Chaser) {
         return chasersPhase(currentState);
     } else if (currentPhase === QuidditchPosition.Beater) {
-        if (userInput && !Array.isArray(userInput)) {
-            return beatersPhase(currentState, userInput as QuidditchPosition);
+        if (userInput) {
+            return beatersPhase(
+                currentState,
+                userInput as ManualKnockdownInput
+            );
         } else {
             return beatersPhase(currentState);
         }
@@ -40,8 +48,8 @@ export const simulatePhase = (
     } else if (currentPhase === QuidditchPosition.Seeker) {
         return seekersPhase(currentState);
     } else if (currentPhase === 'crowd') {
-        if (userInput && Array.isArray(userInput)) {
-            return crowdsPhase(currentState, userInput as QuidditchPosition[]);
+        if (userInput) {
+            return crowdsPhase(currentState, userInput as ManualCrowdInput);
         } else {
             return crowdsPhase(currentState);
         }

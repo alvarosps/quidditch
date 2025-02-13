@@ -26,6 +26,7 @@ export const initialSimulationState: SimulationState = {
         team2: 0,
     },
     roundDescriptions: [],
+    crowdRolls: [],
 };
 
 export const initialSimulationData: SimulationContextType = {

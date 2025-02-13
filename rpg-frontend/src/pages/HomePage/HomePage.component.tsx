@@ -13,6 +13,7 @@ import { teamTerra } from '@mocks/houses/terra/teamTerra';
 import { QuidditchTeam } from '@engine/QuidditchTeam';
 import { useTeamsContext } from '@providers/TeamsProvider';
 import { HeroSection, TeamCard } from './HomePage.styles';
+import SimulationControls from '@components/SimulationControls';
 
 const teams: QuidditchTeam[] = [TeamAgua, teamAr, teamFogo, teamTerra];
 

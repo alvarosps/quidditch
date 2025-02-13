@@ -2,17 +2,18 @@ import { QuidditchMatch } from 'engine/QuidditchMatch';
 import { QuidditchMatchScore } from '@_types/Quidditch';
 import {
     GameModeType,
+    ManualCrowdInput,
+    ManualKnockdownInput,
     PhaseData,
     SimulationResult,
     SimulationState,
 } from '@_types/Simulation';
-import { QuidditchPosition } from '@constants/quidditch';
 
 export type SimulationMode = 'auto' | 'roundByRound';
 
 export type UserInputData = {
-    knockdown?: QuidditchPosition | null;
-    crowd?: QuidditchPosition[] | null;
+    knockdown?: ManualKnockdownInput | null;
+    crowd?: ManualCrowdInput | null;
 };
 
 export type SimulationContextType = {
@@ -21,7 +22,7 @@ export type SimulationContextType = {
     match: QuidditchMatch | null;
     setMatch: (match: QuidditchMatch | null) => void;
     simulateNextRound: (
-        userInput?: QuidditchPosition | QuidditchPosition[]
+        userInput?: ManualKnockdownInput | ManualCrowdInput
     ) => void;
     simulationState: SimulationState;
     simulationMode: SimulationMode;
@@ -41,7 +42,7 @@ export type SimulationContextType = {
     resetMatch: () => void;
     simulateNextPhase: (
         state: SimulationState,
-        userInput?: QuidditchPosition | QuidditchPosition[]
+        userInput?: ManualKnockdownInput | ManualCrowdInput
     ) => SimulationResult;
     winner: string;
     matchEnded: boolean;

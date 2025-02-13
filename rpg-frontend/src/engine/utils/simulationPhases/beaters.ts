@@ -19,48 +19,41 @@ import { getRoundDescriptionsObjectOnPhase } from '../descriptions';
 
 export const beatersPhase = (
     state: SimulationState,
-    userInput?: QuidditchPosition
+    userInput?: ManualKnockdownInput
 ): SimulationResult => {
-    if (state.currentTeamIndex === 1) {
-        const team1Phase = teamBeatersRound(state, 1, userInput);
-        if (team1Phase.userInputRequired) {
-            return team1Phase;
-        }
-        const team2Phase = teamBeatersRound(team1Phase.newState, 2, userInput);
-        if (team2Phase.userInputRequired) {
-            return team2Phase;
-        }
-        return {
-            newState: {
-                ...team2Phase.newState,
-                currentPhaseIndex: state.currentPhaseIndex + 1,
-                currentTeamIndex: 2,
-            },
-        };
-    } else {
-        const team2Phase = teamBeatersRound(state, 2, userInput);
-        if (team2Phase.userInputRequired) {
-            return team2Phase;
-        }
-        return {
-            newState: {
-                ...team2Phase.newState,
-                currentPhaseIndex: state.currentPhaseIndex + 1,
-                currentTeamIndex: 1,
-            },
-        };
+    const team1Phase = teamBeatersRound(state, 1, false, userInput);
+    console.log('team1Phase', team1Phase);
+    const team2Phase = teamBeatersRound(
+        team1Phase.newState,
+        2,
+        team1Phase.userInputRequired,
+        userInput
+    );
+    if (team2Phase.userInputRequired) {
+        return team2Phase;
     }
+    return {
+        newState: {
+            ...team2Phase.newState,
+            currentPhaseIndex: state.currentPhaseIndex + 1,
+            currentTeamIndex: 2,
+        },
+    };
 };
 
 export const teamBeatersRound = (
     state: SimulationState,
     teamIndex: number,
-    userInput?: QuidditchPosition
+    userInputRequired?: boolean,
+    userInput?: ManualKnockdownInput
 ): SimulationResult => {
     const currentState = { ...state };
     const team = teamIndex === 1 ? currentState.team1 : currentState.team2;
+    const teamName = team.getName();
     let beatersRolls: number[] = [];
-    const beatersPlaying = team.getMainTeam().Beater;
+    const beatersPlaying = team
+        .getMainTeam()
+        .Beater.filter((beater) => beater.getTeam() === teamName);
     const beatersNames = beatersPlaying.map((beater) => beater.getName());
 
     const beatersRoundDescription = [];
@@ -81,9 +74,15 @@ export const teamBeatersRound = (
             userInputRequired: false,
         };
     }
-    if (currentState.beatersRolls.length > 0) {
-        beatersRolls = { ...currentState.beatersRolls };
-    } else {
+    console.log('1', beatersRolls);
+    if (userInput && currentState.beatersRolls.length >= teamIndex) {
+        console.log('on state', currentState.beatersRolls);
+        beatersRolls = [...currentState.beatersRolls[teamIndex - 1]];
+        console.log('beatersRolls', beatersRolls);
+    }
+    console.log('2', beatersRolls);
+    if (beatersRolls.length === 0) {
+        console.log('beatersPlaying', beatersPlaying);
         for (const beater of beatersPlaying) {
             const beaterBonus = beater.getPlayerBonus();
             const diceRoll = getDiceRoll(beaterBonus);
@@ -95,19 +94,24 @@ export const teamBeatersRound = (
             team.updateTeamPlayerMainTeam(beater, QuidditchPosition.Beater);
         }
     }
-
+    console.log('beaterrrrrrr', beatersRolls);
     if (
-        currentState.manualMode.knockdown &&
-        beatersPhaseRequireManualInput(beatersRolls[0], beatersRolls[1] || 0) &&
-        !userInput
+        (currentState.manualMode.knockdown &&
+            beatersPhaseRequireManualInput(
+                beatersRolls[0],
+                beatersRolls[1] || 0
+            ) &&
+            !userInput) ||
+        userInputRequired
     ) {
+        const newBeaterRolls = currentState.beatersRolls;
+        newBeaterRolls.push(
+            beatersRolls.length === 2 ? beatersRolls : [beatersRolls[0], 0]
+        );
         return {
             newState: {
                 ...state,
-                beatersRolls:
-                    beatersRolls.length === 2
-                        ? beatersRolls
-                        : [beatersRolls[0], 0],
+                beatersRolls: newBeaterRolls,
                 roundDescriptions: getRoundDescriptionsObjectOnPhase(
                     currentState,
                     teamIndex,
@@ -152,6 +156,8 @@ export const teamBeatersRound = (
             userInput,
             beatersRoundDescription
         );
+    } else {
+        console.log('else', beatersRolls);
     }
 };
 
@@ -161,7 +167,7 @@ const beatersPhaseResultNoInput = (
     beatersNames: string[],
     state: SimulationState,
     teamIndex: number,
-    userInput: QuidditchPosition,
+    userInput: ManualKnockdownInput,
     beatersRoundDescription: string[]
 ): SimulationResult => {
     let phaseDescription = '';
@@ -169,15 +175,24 @@ const beatersPhaseResultNoInput = (
     let positionToKnockOut: QuidditchPosition;
     const [b1, b2] = beaterRolls;
     if (userInput) {
-        if (
-            userInput === QuidditchPosition.Seeker ||
-            userInput === QuidditchPosition.Keeper
-        ) {
-            playerToKnockout = team.getMainTeam()[userInput];
+        const positionForTeam =
+            teamIndex === 1 ? userInput.team1 : userInput.team2;
+        if (positionForTeam) {
+            if (
+                positionForTeam === QuidditchPosition.Seeker ||
+                positionForTeam === QuidditchPosition.Keeper
+            ) {
+                playerToKnockout = team.getMainTeam()[positionForTeam];
+            } else {
+                playerToKnockout = team.getMainTeam()[positionForTeam][0];
+            }
+            positionToKnockOut = positionForTeam;
         } else {
-            playerToKnockout = team.getMainTeam()[userInput][0];
+            [playerToKnockout, positionToKnockOut] = getPlayerToKnockout(
+                state,
+                beaterRolls
+            );
         }
-        positionToKnockOut = userInput;
     } else {
         [playerToKnockout, positionToKnockOut] = getPlayerToKnockout(
             state,
@@ -328,21 +343,30 @@ const beatersPhaseResultNoInputSingleBeater = (
     beaterName: string,
     state: SimulationState,
     teamIndex: number,
-    userInput: QuidditchPosition,
+    userInput: ManualKnockdownInput,
     beatersRoundDescription: string[]
 ): SimulationResult => {
     let playerToKnockout: QuidditchPlayer;
     let positionToKnockOut: QuidditchPosition;
     if (userInput) {
-        if (
-            userInput === QuidditchPosition.Seeker ||
-            userInput === QuidditchPosition.Keeper
-        ) {
-            playerToKnockout = team.getMainTeam()[userInput];
+        const positionForTeam =
+            teamIndex === 1 ? userInput.team1 : userInput.team2;
+        if (positionForTeam) {
+            if (
+                positionForTeam === QuidditchPosition.Seeker ||
+                positionForTeam === QuidditchPosition.Keeper
+            ) {
+                playerToKnockout = team.getMainTeam()[positionForTeam];
+            } else {
+                playerToKnockout = team.getMainTeam()[positionForTeam][0];
+            }
+            positionToKnockOut = positionForTeam;
         } else {
-            playerToKnockout = team.getMainTeam()[userInput][0];
+            [playerToKnockout, positionToKnockOut] = getPlayerToKnockout(
+                state,
+                [beaterRoll, 0]
+            );
         }
-        positionToKnockOut = userInput;
     } else {
         [playerToKnockout, positionToKnockOut] = getPlayerToKnockout(state, [
             beaterRoll,

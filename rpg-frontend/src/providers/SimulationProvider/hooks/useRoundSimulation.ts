@@ -1,7 +1,11 @@
-import { PhaseData, SimulationState } from '@_types/Simulation';
+import {
+    ManualCrowdInput,
+    ManualKnockdownInput,
+    PhaseData,
+    SimulationState,
+} from '@_types/Simulation';
 import { initialSimulationState } from '../SimulationProvider.constants';
 import { useEffect, useRef, useState } from 'react';
-import { QuidditchPosition } from '@constants/quidditch';
 import { checkForMatchEnd, simulatePhase } from '@engine/utils/simulation';
 import { incrementSeekersRoundBonus } from '@engine/utils/simulationPhases';
 import { QuidditchMatch } from '@engine/QuidditchMatch';
@@ -13,12 +17,13 @@ export const useRoundSimulation = () => {
     );
     const [phaseData, setPhaseData] = useState<PhaseData | null>(null);
     const [userInputData, setUserInputData] = useState<{
-        knockdown?: QuidditchPosition | null;
-        crowd?: QuidditchPosition[] | null;
+        knockdown?: ManualKnockdownInput | null;
+        crowd?: ManualCrowdInput | null;
     }>({});
     const isRoundOver = useRef(false);
     const [score, setScore] = useState({ team1: 0, team2: 0 });
-
+    console.log('userInput', userInputData);
+    console.log('phaseData', phaseData);
     const handleNeedForUserInput = (
         state: SimulationState,
         typeOfInput: 'crowd' | 'knockdown'
@@ -27,21 +32,26 @@ export const useRoundSimulation = () => {
             round: state.currentRound,
             phaseIndex: state.currentPhaseIndex,
             roll: state.lastRoll,
+            rollTeam1: state.crowdRolls[0],
+            rollTeam2: state.crowdRolls[1],
+            beaterRolls: state.beatersRolls,
             currentTeam:
                 state.currentTeamIndex === 1 ? state.team1 : state.team2,
             typeOfInput,
+            team1: state.team1,
+            team2: state.team2,
         });
     };
 
     const simulateNextPhase = (
         state: SimulationState,
-        userInput?: QuidditchPosition | QuidditchPosition[]
+        userInput?: ManualKnockdownInput | ManualCrowdInput
     ) => {
         return simulatePhase(state, userInput);
     };
 
     const simulateNextRound = (
-        userInput?: QuidditchPosition | QuidditchPosition[]
+        userInput?: ManualKnockdownInput | ManualCrowdInput
     ) => {
         let isMatchOver = checkForMatchEnd(simulationState);
         if (isMatchOver) {
@@ -124,7 +134,7 @@ export const useRoundSimulation = () => {
             team2: match?.getTeam2(),
         }));
     }, [match, setSimulationState]);
-
+    console.log('simulationState', simulationState);
     return {
         match,
         setMatch,

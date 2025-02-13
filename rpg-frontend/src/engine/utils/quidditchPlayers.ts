@@ -33,19 +33,18 @@ export const getPositionPlayers = (
 };
 
 export const choosePositionRandomly = (state: SimulationState) => {
-    const opponentTeam =
-        state.currentTeamIndex === 1 ? state.team2 : state.team1;
+    const team = state.currentTeamIndex === 1 ? state.team1 : state.team2;
 
-    const mainTeamOpponent = opponentTeam.getMainTeam();
+    const mainTeam = team.getMainTeam();
     let highestPriority: QuidditchPosition | undefined =
         QuidditchPosition.Seeker;
-    if (!mainTeamOpponent[QuidditchPosition.Seeker]) {
+    if (!mainTeam[QuidditchPosition.Seeker]) {
         highestPriority = QuidditchPosition.Chaser;
-        if (mainTeamOpponent[QuidditchPosition.Chaser].length === 0) {
+        if (mainTeam[QuidditchPosition.Chaser].length === 0) {
             highestPriority = QuidditchPosition.Keeper;
-            if (!mainTeamOpponent[QuidditchPosition.Keeper]) {
+            if (!mainTeam[QuidditchPosition.Keeper]) {
                 highestPriority = QuidditchPosition.Beater;
-                if (mainTeamOpponent[QuidditchPosition.Beater].length === 0) {
+                if (mainTeam[QuidditchPosition.Beater].length === 0) {
                     highestPriority = undefined;
                 }
             }
@@ -53,13 +52,13 @@ export const choosePositionRandomly = (state: SimulationState) => {
     }
     if (highestPriority) {
         const positionsToChoose: QuidditchPosition[] = [
-            mainTeamOpponent[QuidditchPosition.Keeper]
+            mainTeam[QuidditchPosition.Keeper]
                 ? QuidditchPosition.Keeper
                 : highestPriority,
-            mainTeamOpponent[QuidditchPosition.Beater].length > 0
+            mainTeam[QuidditchPosition.Beater].length > 0
                 ? QuidditchPosition.Beater
                 : highestPriority,
-            mainTeamOpponent[QuidditchPosition.Chaser].length > 0
+            mainTeam[QuidditchPosition.Chaser].length > 0
                 ? QuidditchPosition.Chaser
                 : highestPriority,
             highestPriority,
