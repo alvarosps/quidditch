@@ -211,7 +211,16 @@ const beatersPhaseResultNoInput = (
         // 13+ e 10+
         // knockdown with probability, wins 10 points
         if (positionToKnockOut && playerToKnockout) {
-            knockoutPlayer(state, playerToKnockout, positionToKnockOut);
+            const randomRoll = getDiceRoll(0);
+            if (randomRoll <= 3) {
+                knockoutPlayer(state, playerToKnockout, positionToKnockOut);
+            } else {
+                playerToKnockout.setForward(-2);
+                opponentTeam.updateTeamPlayerMainTeam(
+                    playerToKnockout,
+                    positionToKnockOut
+                );
+            }
         }
         newScores = updateScores(state, { teamPoints: 10 });
         beatersRoundDescription.push(

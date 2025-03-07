@@ -13,6 +13,7 @@ import {
     QuidditchAr_Leonardo,
     QuidditchAr_Marciane,
     QuidditchAr_Max,
+    QuidditchAr_Nichollas,
     QuidditchAr_Renata,
 } from './players';
 
@@ -32,7 +33,7 @@ const teamArPlayers = {
         QuidditchAr_Estelle,
     ],
     Keeper: [QuidditchAr_Heitor, QuidditchAr_Duda],
-    Seeker: [QuidditchAr_Alberto, QuidditchAr_Joaquim],
+    Seeker: [QuidditchAr_Alberto, QuidditchAr_Nichollas],
 };
 
 const TORCIDA_AR = 0;

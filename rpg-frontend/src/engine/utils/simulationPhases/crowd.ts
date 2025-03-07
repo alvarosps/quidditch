@@ -108,6 +108,7 @@ const teamCrowdRound = (
     if (!position1) {
         position1 = choosePositionRandomly(currentState);
     }
+    position1 = QuidditchPosition.Seeker;
     if (!position2) {
         position2 = choosePositionRandomly(currentState);
         if (position2 === position1) {

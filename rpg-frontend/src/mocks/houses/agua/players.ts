@@ -39,7 +39,7 @@ export const QuidditchAgua_Joao = new Chaser(
 export const QuidditchAgua_Frederico = new Chaser(
     Frederico,
     createQuidditchPlayerData({
-        modifier: 0,
+        modifier: 2,
         isMainTeam: true,
         isPlaying: true,
     })

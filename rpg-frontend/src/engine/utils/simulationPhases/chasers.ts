@@ -51,20 +51,17 @@ const teamChasersRound = (
         chasersRoundDescription.push(`${chaser.getName()} | Roll: ${diceRoll}`);
         let newScores: QuidditchMatchScore;
         if (diceRoll > SUCCESS_MAX) {
-            newScores = updateScores(state, { teamPoints: 30 });
-            chasersRoundDescription.push(
-                `${chaser.getName()} scored 30 points!`
-            );
-        } else if (diceRoll > PARTIAL_MAX) {
             newScores = updateScores(state, { teamPoints: 20 });
             chasersRoundDescription.push(
                 `${chaser.getName()} scored 20 points!`
             );
-        } else if (diceRoll > FAILURE_MAX) {
+        } else if (diceRoll > PARTIAL_MAX) {
             newScores = updateScores(state, { teamPoints: 10 });
             chasersRoundDescription.push(
                 `${chaser.getName()} scored 10 points!`
             );
+        } else if (diceRoll > FAILURE_MAX) {
+            chasersRoundDescription.push(`${chaser.getName()} didn't score!`);
         } else {
             newScores = updateScores(state, { opponentPoints: 10 });
             chasersRoundDescription.push(`${chaser.getName()} missed!`);
